@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -104,6 +104,79 @@ namespace Forum_PDP
             {
                 MessageBox.Show("Não foi possível inserir um novo registro! \n" + ex.Message);
             }
+        }
+
+        private void btAlterar_Click(object sender, EventArgs e)
+        {
+            if (tbID.Text == "")
+                return;
+
+            MySqlBaseConnectionStringBuilder conexaoBD = conexaoBanco();
+            MySqlConnection realizaConexaoBD = new MySqlConnection(conexaoBD.ToString());
+            try
+            {
+                realizaConexaoBD.Open();
+
+                MySqlCommand comandoMySql = realizaConexaoBD.CreateCommand();
+                comandoMySql.CommandText = "update cliente set " +
+                    "nmCliente = '" + tbNome.Text + "', " +
+                    "logradouro = '" + tbLogradouro.Text + "', " +
+                    "enderecoNumero = '" + tbNumero.Text + "' " +
+                    "where idCliente = " + tbID.Text;
+                comandoMySql.ExecuteNonQuery();
+                realizaConexaoBD.Close();
+                atualizarDataGrid();
+                limparCampos();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Não foi possível alterar o registro! \n" + ex.Message);
+            }
+
+        }
+
+        private void dataGridView1_Click(object sender, EventArgs e)
+        {
+            tbID.Text = Convert.ToString(dataGridView1.CurrentRow.Cells["ID"].Value);
+            tbNome.Text = (string)dataGridView1.CurrentRow.Cells["Nome"].Value;
+            string endereco = (string)dataGridView1.CurrentRow.Cells["Endereco"].Value;
+            if (endereco.IndexOf(',') >= 0)
+            {
+                tbLogradouro.Text = endereco.Substring(0, endereco.IndexOf(','));
+                tbNumero.Text = endereco.Substring(endereco.IndexOf(',') + 1);
+            }
+            else
+            {
+                tbLogradouro.Text = endereco;
+                tbNumero.Text = "";
+            }
+        }
+
+        private void tbExcluir_Click(object sender, EventArgs e)
+        {
+            if (tbID.Text == "")
+                return;
+
+            MySqlBaseConnectionStringBuilder conexaoBD = conexaoBanco();
+            MySqlConnection realizaConexaoBD = new MySqlConnection(conexaoBD.ToString());
+            try
+            {
+                realizaConexaoBD.Open();
+
+                MySqlCommand comandoMySql = realizaConexaoBD.CreateCommand();
+                comandoMySql.CommandText = "delete from cliente where idCliente = " + tbID.Text;
+                comandoMySql.ExecuteNonQuery();
+                realizaConexaoBD.Close();
+                atualizarDataGrid();
+                limparCampos();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Não foi possível excluir o registro! \n" + ex.Message);
+            }
+
         }
     }
 }
